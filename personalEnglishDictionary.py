@@ -47,36 +47,73 @@ class Words:
         return [word[0] for word in words] 
     
     def Addword_menu(self):
+            print("--------------------\npress x if you want to exit\n-------------------- ")
             print("How many words would you like add? ")
             num=int(input())
             for i in range(num):
                 print("Write the word you want to add: ")
                 word=input()
-                print(f"The value of {word}: ")
-                word_value=input()
-                self.addWord(word.lower(),word_value.lower())
+                if word !="x":
+                    print(f"The value of {word}: ")
+                    word_value=input()
+                    if word_value!="x":
+                        self.addWord(word.lower(),word_value.lower())
+                    else:
+                        print(f"{word} did not add to the database")
+                        cont()
+                else:
+                    cont()
                 
     def exerciseWithWord(self):
+        print("--------------------\npress x if you want to exit\n-------------------- ")
         sel_word=[]
         words= self.getWord()
         count=1
+        incorrect_count=0
+        numR=3
+        space="\n******************************\n"
         while len(words)!=len(sel_word):
             selected_word = random.choice(words)
+            exit_let="x"
             if selected_word not in sel_word:
                 while True:
                     print(selected_word ,"\nValue of word: ")
                     value=input()
-                    if value.lower()==self.value_control(selected_word):
+                    correct_value=self.value_control(selected_word)
+                    if value ==exit_let:
+                        cont()
+                    elif value.lower()==correct_value:
                         print(f"Doğru bilinen kelime sayısı:{count}")
-                        print("Good!\n******************************\n")
+                        print("Good!"+space)
                         break
                     else:
-                        print("Try Again!\n******************************\n")
+                        incorrect_count+=1
+                        if incorrect_count<numR:
+                            print("Try Again!"+space)
+                            print("Number of remaining rights:",numR-incorrect_count)
+                        else:
+                            print(f"The value of {selected_word}:",correct_value,space)
+                            break
                 
                 count+=1
                 sel_word.append(selected_word)
-            
+    
     def value_control(self,value):
+        """
+        
+
+        Parameters
+        ----------
+        value : string
+            client's response to the word
+
+        Returns
+        -------
+        word_value : string
+            return the correct value of the word
+
+        """
+        
         self.cursor.execute("SELECT WORD_Value FROM DICTIONARY WHERE WORD=?",(value,))
         row = self.cursor.fetchone()
         if row:
@@ -86,7 +123,7 @@ class Words:
             print("Kelime bulunamadı.")
             return None
         
-    #tüm kelimeleri getir
+    #display every word in the database
     def all_word(self):
         self.cursor.execute("SELECT * FROM DICTIONARY")
         rows = self.cursor.fetchall()
@@ -96,18 +133,19 @@ class Words:
         print(df)
         
             
-    
-while True:
-    main_menu()
-    choice=input()
-    w=Words()
-    if choice not in ["1","2","3"]:
-       print("Try again!")
-    elif choice=="1":
-        w.Addword_menu()
-        
-    elif choice=="2":
-        w.exerciseWithWord()
-    else:
-       w.all_word()
+def cont():   
+    while True:
+        main_menu()
+        choice=input()
+        w=Words()
+        if choice not in ["1","2","3"]:
+           print("Try again!")
+        elif choice=="1":
+            w.Addword_menu()
+            
+        elif choice=="2":
+            w.exerciseWithWord()
+        else:
+           w.all_word()
        
+cont()
